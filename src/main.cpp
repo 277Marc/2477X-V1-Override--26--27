@@ -288,9 +288,7 @@ void opcontrol() {
       } else if (master.get_digital(DIGITAL_L1)) {
         armPID.target_set(0);  // 0 rotations = 0 * 360 deg * 100 = 0 centidegrees
 
-      } else if (master.get_digital(DIGITAL_L2)) {
-        Claw.set(true); 
-      }
+      } 
 
 
       if(!(countController % 25)){
@@ -298,7 +296,7 @@ void opcontrol() {
       }
       countController++;
 
-
+        Claw.button_toggle(master.get_digital(pros::E_CONTROLLER_DIGITAL_L2));
 
 
     pros::delay(ez::util::DELAY_TIME);  // This is used for timer calculations!  Keep this ez::util::DELAY_TIME

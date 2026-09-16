@@ -18,7 +18,7 @@ extern Drive chassis;
 //inline pros::Controller master(pros::E_CONTROLLER_MASTER);
 //inline pros::Controller partner(pros::E_CONTROLLER_PARTNER);
 
-inline ez::Piston Claw('H');
+inline ez::Piston Claw('D');
 
 
 inline pros::Motor rARM(17);
