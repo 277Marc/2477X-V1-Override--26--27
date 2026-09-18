@@ -14,7 +14,7 @@ ez::Drive chassis(
     {-11, -12, -13},     // Left Chassis Ports (negative port will reverse it!)
     {18, 19, 20},  // Right Chassis Ports (negative port will reverse it!)
 
-    7,      // IMU Port
+    14,      // IMU Port
     3.25,  // Wheel Diameter (Remember, 4" wheels without screw holes are actually 4.125!)
     450);   // Wheel RPM = cartridge * (motor gear / wheel gear)
 
@@ -55,7 +55,6 @@ void initialize() {
 
   // Autonomous Selector using LLEMU
   ez::as::auton_selector.autons_add({
-    {"Blue Side\n\nThis is an example autonomous routine.  Change it in autons.cpp!", blueSIDE},
       {"Drive\n\nDrive forward and come back", drive_example},
       {"Turn\n\nTurn 3 times.", turn_example},
       {"Drive and Turn\n\nDrive forward, turn, come back", drive_and_turn},
@@ -211,6 +210,8 @@ pros::Task ezScreenTask(ez_screen_task);
 void ez_template_extras() {
   // Only run this when not connected to a competition switch
   if (!pros::competition::is_connected()) {
+    static bool auton_test_triggered = false;
+
     // PID Tuner
     // - after you find values that you're happy with, you'll have to set them in auton.cpp
 
@@ -221,11 +222,17 @@ void ez_template_extras() {
     if (master.get_digital_new_press(DIGITAL_X))
       chassis.pid_tuner_toggle();
 
-    // Trigger the selected autonomous routine
+    // Manual autonomous test trigger. This fires only once when B + Down are pressed,
+    // then resets when the buttons are released so it cannot freeze the robot loop.
     if (master.get_digital(DIGITAL_B) && master.get_digital(DIGITAL_DOWN)) {
-      pros::motor_brake_mode_e_t preference = chassis.drive_brake_get();
-      autonomous();
-      chassis.drive_brake_set(preference);
+      if (!auton_test_triggered) {
+        auton_test_triggered = true;
+        pros::motor_brake_mode_e_t preference = chassis.drive_brake_get();
+        autonomous();
+        chassis.drive_brake_set(preference);
+      }
+    } else {
+      auton_test_triggered = false;
     }
 
     // Allow PID Tuner to iterate
